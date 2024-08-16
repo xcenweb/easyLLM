@@ -1,3 +1,8 @@
+# File folder
 __pycache__/
 !models/
 !venvs/
+
+# dev shell script
+git.sh
+easyLLM_install.sh

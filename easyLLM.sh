@@ -125,17 +125,24 @@ if [ ! -d $easyLLM_rootDir ];then
         sed -i 's@^\(deb.*stable main\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux/apt/termux-main stable main@' $PREFIX/etc/apt/sources.list
         pkg update -y && pkg upgrade -y
         pkg install ncurses-utils python3 python-pip -y
-        pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+        pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
     
     elif [ $environment_type == 2 ];then
         # ubuntu
         apt update -y && apt upgrade -y
         apt install sudo -y
-        sudo apt install python build-essential python3-venv zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget rustc -y
+        sudo apt install python build-essential python3-venv zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget rustc git -y
         pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
         python -m pip install --upgrade pip
-        # github拉取easyLLM核心
+        
+        # github拉取easyLLM核心后重命名为.easyLLM
+        git clone https://github.com/xcenweb/easyLLM.git
+        mv easyLLM .easyLLM
     fi
+    
+    color_echo
+    color_echo green "easyLLM::初始化完毕";
+    color_echo
 fi
 
 # 开始UI
@@ -151,14 +158,14 @@ color_echo
 color_echo green "Github仓库->https://github.com/xcenweb/easyLLM\n作者微信->wx_0xbcyuncen"
 color_echo
 
+# termux中：确认后启动已经安装好的Ubuntu系统
 if [ -d $HOME/.ubuntu-fs ] && [ $environment_type == 1 ];then
-    # termux中：确认后启动已经安装好的Ubuntu系统
     read -p $(tput setaf 3)"你已安装了 Ubuntu，回车则直接登录Ubuntu系统以进行LLM管理和运行LLM，ctrl+c退出！"$(tput setaf 3) ok
     start_ubuntu
 fi
 
+# Ubuntu中：
 if [ $environment_type == 2 ];then
-    # Ubuntu中：
     echo dev
 fi
 
