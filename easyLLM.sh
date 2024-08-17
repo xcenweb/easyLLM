@@ -2,16 +2,12 @@
 
 easyLLM_version='1.0.0' # 当前版本
 
-easyLLM_rootDir=$HOME/.easyLLM            # 主目录
+easyLLM_rootDir=.easyLLM            # 主目录
 easyLLM_coreDir=$easyLLM_rootDir/core       # 核心功能
 easyLLM_deptDir=$easyLLM_rootDir/deployment # LLM配套安装器
 easyLLM_modelDir=$easyLLM_rootDir/models    # 模型库
 easyLLM_fsinDir=$easyLLM_rootDir/fsinstaller # 系统镜像安装库
-
-python_venvs=$HOME/.easyLLM/venvs # Python虚拟环境目录，对应模型
-
-environment_type=0
-environment_name=''
+python_venvs=.easyLLM/venvs # Python虚拟环境目录，对应模型
 
 color_echo() {
     # 带颜色打印文本
@@ -39,48 +35,19 @@ color_echo() {
 
 cleanup() {
     # 退出时执行
-    if [ $? -eq 0 ]; then
+    id=$?
+    if [ $id -eq 0 ];then
+        clear
+        color_echo blue "\neasyLLM::exit 退出";
         color_echo
-        color_echo blue "easyLLM::exit 退出脚本";
-        color_echo
+    elif [ $id -eq 40 ];then
+        bash easyLLM.sh
     else
-        color_echo
-        color_echo red "easyLLM::error 脚本执行错误，请将上方报错内容提交至issue：https://github.com/xcenweb/easyLLM/issues";
+        color_echo red "\neasyLLM::error 执行错误，请将上方报错相关内容提交\nissue：https://github.com/xcenweb/easyLLM/issues";
         color_echo
     fi
 }
 trap cleanup EXIT
-
-check_environment() {
-    # 获取脚本运行的环境
-    color_echo
-    
-    # termux
-    if [ -n "$TERMUX_VERSION" ]; then
-        color_echo blue "This script is running in Termux.\n此脚本正在Termux中运行"
-        color_echo
-        environment_type=1
-        environment_name='Termux'
-        return 1
-    fi
-    
-    # ubuntu
-    if [ -f /etc/os-release ]; then
-        . /etc/os-release
-        if [ "$ID" == "ubuntu" ]; then
-            color_echo blue "This script is running on Ubuntu.\n此脚本正在Ubuntu上运行"
-            color_echo
-            environment_type=2
-            environment_name='Ubuntu'
-            return 2
-        fi
-    fi
-    
-    color_echo red "This script is currently only supported in Ubuntu and Termux\n该脚本目前只支持在Ubuntu、termux中运行"
-    color_echo
-    exit 1
-}
-check_environment
 
 add_venv() {
     # 新增一个Python虚拟环境
@@ -128,6 +95,34 @@ start_ubuntu() {
     exec $command
 }
 
+
+# 获取脚本运行的环境
+# environment_type 环境默化id
+# environment_name 环境名称
+clear
+if [ -n "$TERMUX_VERSION" ]; then
+    # termux
+    color_echo blue "This script is running in Termux.\n此脚本正在Termux中运行"
+    color_echo
+    environment_type=1
+    environment_name='Termux'
+
+elif [ -f /etc/os-release ]; then
+    # ubuntu
+    . /etc/os-release
+    if [ "$ID" == "ubuntu" ]; then
+        color_echo blue "This script is running on Ubuntu.\n此脚本正在Ubuntu上运行"
+        color_echo
+        environment_type=2
+        environment_name='Ubuntu'
+    fi
+else
+    color_echo red "This script is currently only supported in Ubuntu and Termux\n该脚本目前只支持在Ubuntu、termux中运行"
+    color_echo
+    exit 1
+fi
+
+
 # 初始化
 if [ ! -d $easyLLM_rootDir ];then
     color_echo yellow 'EasyLLM未进行初始化...'
@@ -151,7 +146,7 @@ if [ ! -d $easyLLM_rootDir ];then
         
         # github拉取easyLLM核心后重命名为.easyLLM
         git clone https://github.com/xcenweb/easyLLM.git
-        mv easyLLM .easyLLM
+        #mv easyLLM .easyLLM
     fi
     
     color_echo
@@ -160,6 +155,7 @@ if [ ! -d $easyLLM_rootDir ];then
 fi
 
 # 开始UI
+
 echo "    ______                 __    __    __  ___";
 echo "   / ____/___ ________  __/ /   / /   /  |/  /";
 echo "  / __/ / __ \`/ ___/ / / / /   / /   / /|_/ / ";
@@ -173,16 +169,25 @@ color_echo green "Github仓库->https://github.com/xcenweb/easyLLM\n作者微信
 color_echo
 
 # termux中：确认后启动已经安装好的Ubuntu系统
-if [ -d $HOME/.ubuntu-fs ] && [ $environment_type == 1 ];then
+if [ -d .ubuntu-fs ] && [ $environment_type == 1 ];then
     read -p $(tput setaf 3)"你已安装了 Ubuntu，回车则直接登录Ubuntu系统以进行LLM管理和运行LLM，ctrl+c退出！"$(tput setaf 3) ok
     start_ubuntu
+elif [ $environment_type == 2 ];then
+    color_echo
 else
     install_ubuntu
 fi
-exit 3
+
 # Ubuntu中：列出操作列表
 if [ $environment_type == 2 ];then
-    echo -e " 1. 选择运行LLM    2.在线安装LLM\n"
-    read -p "输入数字进行相应操作：" act
-    echo $act
+    echo -e " 1. 选择运行LLM      2. 在线安装LLM\n"
+    read -p "输入上方数字进行相应操作，输入 exit 退出：" act
+    if [ ! -n "$act" ];then
+        # 输入为空，返回
+        exit 40
+    elif [ "$act" == "exit" ];then
+        exit 0
+    else
+        exit 40
+    fi
 fi
