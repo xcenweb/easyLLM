@@ -41,7 +41,7 @@ cleanup() {
     # 退出时执行
     if [ $? -eq 0 ]; then
         color_echo
-        color_echo blue "easyLLM::close 退出脚本";
+        color_echo blue "easyLLM::exit 退出脚本";
         color_echo
     else
         color_echo
@@ -82,11 +82,24 @@ check_environment() {
 }
 check_environment
 
+add_venv() {
+    # 新增一个Python虚拟环境
+    python -m venv $python_venvs/$1
+}
+
+del_venv() {
+    # 删除一个Python虚拟环境
+    deactivate
+    rm -rf $python_venvs/$1
+}
+
 install_ubuntu() {
     # 对于termux：安装 Ubuntu
+    color_echo yellow "你未安装 Ubuntu，这是easyLLM运行所需，请你安装"
     read -p $(tput setaf 3)"回车则开始安装Ubuntu，请确认手机存储>10G！按ctrl+c退出。"$(tput setaf 3) ok
+    color_echo
     pkg install wget openssl-tool proot -y
-    bash ubuntu.sh
+    bash $easyLLM_fsinDir/ubuntu.sh
 }
 
 start_ubuntu() {
@@ -121,17 +134,18 @@ if [ ! -d $easyLLM_rootDir ];then
     
     if [ $environment_type == 1 ];then
         # termux
-        # 在 termux 中运行时不创建 .easyLLM 目录，只在除 termux 外才创建
+        # 在 termux 中初始化时不创建 .easyLLM 目录，只在除 termux 外才创建
         sed -i 's@^\(deb.*stable main\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux/apt/termux-main stable main@' $PREFIX/etc/apt/sources.list
         pkg update -y && pkg upgrade -y
-        pkg install ncurses-utils python3 python-pip -y
+        pkg install ncurses-utils python3 python-pip git screenfetch -y
         pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
     
     elif [ $environment_type == 2 ];then
         # ubuntu
         apt update -y && apt upgrade -y
         apt install sudo -y
-        sudo apt install python build-essential python3-venv zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget rustc git -y
+        sudo apt install python python3-venv git -y
+        sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget rustc -y
         pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
         python -m pip install --upgrade pip
         
@@ -162,20 +176,13 @@ color_echo
 if [ -d $HOME/.ubuntu-fs ] && [ $environment_type == 1 ];then
     read -p $(tput setaf 3)"你已安装了 Ubuntu，回车则直接登录Ubuntu系统以进行LLM管理和运行LLM，ctrl+c退出！"$(tput setaf 3) ok
     start_ubuntu
+else
+    install_ubuntu
 fi
-
-# Ubuntu中：
+exit 3
+# Ubuntu中：列出操作列表
 if [ $environment_type == 2 ];then
-    echo dev
+    echo -e " 1. 选择运行LLM    2.在线安装LLM\n"
+    read -p "输入数字进行相应操作：" act
+    echo $act
 fi
-
-# 若当前在termux，则显示选择进入系统列表
-#shopt -s dotglob nullglob
-#declare -a matching_dirs
-#for dir in */; do
-#    dir=${dir%/}
-#    if [[ $dir =~ .*-fs$ ]]; then
-#        matching_dirs+=("$dir")
-#    fi
-#done
-#echo $matching_dirs
