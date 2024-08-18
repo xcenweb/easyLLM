@@ -5,5 +5,5 @@ __pycache__/
 
 # dev shell script
 git.sh
-installer.sh
-update.sh
+# installer.sh
+# update.sh
