@@ -24,7 +24,7 @@ if [ $yn == "y" ]; then
     echo "${PINK}那么咱们就...开始安装(๑•̀ㅂ•́)✧！首先得装点儿必要的库...${PINK}"
     echo "";
     apt update -y && apt install sudo -y
-    sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget -y
+    sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev -y
     echo "";
     echo "";
     

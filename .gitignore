@@ -5,4 +5,5 @@ __pycache__/
 
 # dev shell script
 git.sh
-easyLLM_install.sh
+installer.sh
+update.sh

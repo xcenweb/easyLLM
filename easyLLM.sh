@@ -155,7 +155,6 @@ if [ ! -d $easyLLM_rootDir ];then
 fi
 
 # 开始UI
-
 echo "    ______                 __    __    __  ___";
 echo "   / ____/___ ________  __/ /   / /   /  |/  /";
 echo "  / __/ / __ \`/ ___/ / / / /   / /   / /|_/ / ";
@@ -183,10 +182,11 @@ if [ $environment_type == 2 ];then
     echo -e " 1. 选择运行LLM      2. 在线安装LLM\n"
     read -p "输入上方数字进行相应操作，输入 exit 退出：" act
     if [ ! -n "$act" ];then
-        # 输入为空，返回
         exit 40
     elif [ "$act" == "exit" ];then
         exit 0
+    elif [ $act == 1]
+        python $easyLLM_coreDir/
     else
         exit 40
     fi

@@ -1,0 +1,12 @@
+{
+    "list": [
+        {
+            "name": "index1.9B",
+            "short_name": "index",
+            "modelscope": "IndexTeam/Index-1.9B-Chat",
+            "description": "B站发布的1.9B模型",
+            "install_script": "index1.9B.sh",
+            "use_venv": "base"
+        }
+    ]
+}
