@@ -4,7 +4,7 @@
 # 仅作为 easyLLM 的 Ubuntu 安装器模块 :)
 # 在此感谢原作者！
 
-folder=.ubuntu-fs
+folder=$1
 tarball="ubuntu-rootfs.tar.xz"
 cur=`pwd`
 
@@ -68,7 +68,6 @@ EOF
 
 # pulseaudio
 echo -e "Setting up pulseaudio so you can have music in distro.\n设置pulseaudio，以便您可以在发行版中播放音乐。"
-pkg install pulseaudio -y
 if grep -q "anonymous" ~/../usr/etc/pulse/default.pa;then
     echo -e "module already present\n模块已存在"
 else
@@ -81,12 +80,4 @@ echo -e "Disabled pulseaudio autospawn\n禁用pulseaudio autospawn"
 echo "export PULSE_SERVER=127.0.0.1" >> $folder/etc/profile
 echo -e "Setting Pulseaudio server to 127.0.0.1\n将Pulseaudio服务器设置为127.0.0.1"
 
-# echo -e "fixing shebang of $bin"
-# termux-fix-shebang $bin
-# echo "making $bin executable"
-# chmod +x $bin
-# echo "removing image for some space"
-
 rm $tarball
-screenfetch -A Ubuntu -L
-echo -e "You can now launch Ubuntu."
